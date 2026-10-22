@@ -1,3 +1,4 @@
+![tests](https://github.com/eugeniofelix1990/advanced-css-web-component-overrides/actions/workflows/tests.yml/badge.svg)
 # Web Component Contraction
 
 A small CSS pattern for **re-labelling a third-party button and making its host shrink to the new content**, without the "phantom width" left behind by the original text. Includes a live demo and automated layout and accessibility checks.
