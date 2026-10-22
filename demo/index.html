@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Web Component contraction: demo</title>
+
+<!-- The pattern under test -->
+<link rel="stylesheet" href="../src/contract-web-component.css">
+
+<style>
+  body { margin: 0; padding: 32px; font: 15px/1.5 system-ui, sans-serif; background: #14111f; color: #e8e6f0; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.sub { margin: 0 0 28px; color: #9b97b0; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: #9b97b0; margin: 24px 0 8px; }
+
+  /* Simulated "vendor" header: a flex row that stretches its children */
+  .header { display: flex; justify-content: flex-end; border: 1px dashed #4a4565; border-radius: 8px; padding: 12px; }
+
+  /* Simulated vendor styles (what the third-party component ships with) */
+  x-action-button, x-action-button-naive { display: flex; flex: 1 1 auto; min-width: 240px; }
+  .mdc-button { display: inline-flex; align-items: center; justify-content: center; min-width: 64px; height: 40px; padding: 0 24px; border: 0; border-radius: 20px; background: #4a1fb8; color: #fff; font: 500 14px/1 system-ui, sans-serif; }
+  .mdc-button__label { display: inline-flex; align-items: center; gap: 8px; }
+  .mdc-button__label .label-text { font-size: 14px; }   /* own font-size: font-size:0 on the parent won't reach it */
+  .mdc-button__label svg { width: 18px; height: 18px; fill: currentColor; }
+
+  /* The naive attempt, for comparison */
+  x-action-button-naive { width: fit-content; }
+  x-action-button-naive .mdc-button__label { color: transparent; font-size: 0; }
+  x-action-button-naive .mdc-button__label::after { content: "Custom label"; color: #fff; font-size: 14px; }
+</style>
+</head>
+<body>
+  <h1>Web Component contraction</h1>
+  <p class="sub">Same component, same label. Only the CSS differs.</p>
+
+  <h2>Naive: transparent text, <code>fit-content</code></h2>
+  <div class="header">
+    <x-action-button-naive>
+      <button class="mdc-button">
+        <span class="mdc-button__label">
+          <svg viewBox="0 0 24 24"><path d="M12,2 C12,7.5 16.5,12 22,12 C16.5,12 12,16.5 12,22 C12,16.5 7.5,12 2,12 C7.5,12 12,7.5 12,2 Z"/></svg>
+          <span class="label-text">Original, much longer label</span>
+        </span>
+      </button>
+    </x-action-button-naive>
+  </div>
+
+  <h2>Contracted: <code>contract-web-component.css</code></h2>
+  <div class="header">
+    <x-action-button>
+      <button class="mdc-button">
+        <span class="mdc-button__label">
+          <svg viewBox="0 0 24 24"><path d="M12,2 C12,7.5 16.5,12 22,12 C16.5,12 12,16.5 12,22 C12,16.5 7.5,12 2,12 C7.5,12 12,7.5 12,2 Z"/></svg>
+          <span class="label-text">Original, much longer label</span>
+        </span>
+      </button>
+    </x-action-button>
+  </div>
+</body>
+</html>

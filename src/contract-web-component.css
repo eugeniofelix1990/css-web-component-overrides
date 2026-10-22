@@ -1,0 +1,73 @@
+/* ==========================================================================
+   Web Component contraction pattern
+   Re-label a third-party button and make its host shrink to the new content.
+
+   Usage: replace `x-action-button` with the tag name of your component and
+   adjust the inner class names (`.mdc-button`, `.mdc-button__label`) to match
+   its markup.
+   ========================================================================== */
+
+/* 0. Design tokens ------------------------------------------------------- */
+:root {
+  --wc-label: "Custom label";
+  --wc-fg: #ffffff;
+  --wc-pad-x: 14px;
+  --wc-gap: 6px;
+  --wc-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z'/%3E%3C/svg%3E");
+}
+
+/* 1. Host: size to content, never grow, stay pinned to the end.
+      `max-content` instead of `fit-content`, which also caps at the
+      available space. */
+x-action-button {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin-inline-start: auto !important;
+}
+
+/* 2. Inner button: cancel the library's min-width, set symmetric padding. */
+x-action-button .mdc-button {
+  width: auto !important;
+  min-width: 0 !important;
+  padding: 0 var(--wc-pad-x) !important;
+}
+
+/* 3. Label: flex row for [icon][text].
+      `font-size: 0` is only a fallback for bare text nodes. */
+x-action-button .mdc-button__label {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: var(--wc-gap) !important;
+  font-size: 0 !important;
+  color: var(--wc-fg) !important;
+}
+
+/* 4. Remove every native child from layout (not just from view).
+      Hiding with `color: transparent` leaves the boxes, and the host keeps
+      the width of the original content ("phantom width"). */
+x-action-button .mdc-button__label > * {
+  display: none !important;
+}
+
+/* 5. Icon: inline SVG used as a mask, so it follows `color`. */
+x-action-button .mdc-button__label::before {
+  content: "" !important;
+  flex: none !important;
+  width: 16px !important;
+  height: 16px !important;
+  background-color: currentColor !important;
+  -webkit-mask: var(--wc-icon) center / contain no-repeat !important;
+  mask: var(--wc-icon) center / contain no-repeat !important;
+}
+
+/* 6. Text. */
+x-action-button .mdc-button__label::after {
+  content: var(--wc-label) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
