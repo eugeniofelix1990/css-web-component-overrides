@@ -1,48 +1,175 @@
-name: Tests
+name: CI/CD Pipeline
+
+
 
 on:
+
   push:
+
     branches: [main, master]
+
   pull_request:
+
     branches: [main, master]
+
   workflow_dispatch:
 
+
+
 permissions:
+
   contents: read
 
+
+
 concurrency:
-  group: tests-${{ github.ref }}
+
+  group: ci-${{ github.ref }}
+
   cancel-in-progress: true
 
+
+
 jobs:
+
   playwright:
+
     runs-on: ubuntu-latest
+
     timeout-minutes: 10
 
+
+
     steps:
+
       - uses: actions/checkout@v4
 
+
+
       - uses: actions/setup-python@v5
+
         with:
+
           python-version: "3.12"
+
           cache: pip
+
           cache-dependency-path: requirements-dev.txt
 
+
+
       - name: Install dependencies
+
         run: |
+
           python -m pip install --upgrade pip
+
           pip install -r requirements-dev.txt
 
+
+
       - name: Install Chromium
+
         run: playwright install --with-deps chromium
 
+
+
       - name: Run tests
+
         run: pytest --tracing retain-on-failure
 
+
+
       - name: Upload traces on failure
+
         if: failure()
+
         uses: actions/upload-artifact@v4
+
         with:
+
           name: playwright-traces
+
           path: test-results/
+
           if-no-files-found: ignore
+
+
+
+  deploy:
+
+    needs: playwright
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 5
+
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+
+
+    permissions:
+
+      contents: read
+
+      pages: write
+
+      id-token: write
+
+
+
+    concurrency:
+
+      group: pages
+
+      cancel-in-progress: false
+
+
+
+    environment:
+
+      name: github-pages
+
+      url: ${{ steps.deployment.outputs.page_url }}
+
+
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+
+
+      - name: Assemble site
+
+        run: |
+
+          mkdir -p _site
+
+          cp -r demo/. _site/
+
+          cp -r src _site/src
+
+
+
+      - name: Setup Pages
+
+        uses: actions/configure-pages@v4
+
+
+
+      - name: Upload artifact
+
+        uses: actions/upload-pages-artifact@v3
+
+        with:
+
+          path: ./_site
+
+
+
+      - name: Deploy to GitHub Pages
+
+        id: deployment
+
+        uses: actions/deploy-pages@v4
